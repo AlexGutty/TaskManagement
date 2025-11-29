@@ -1,0 +1,555 @@
+<ion-header>
+
+    <ion-toolbar>
+
+      <ion-buttons slot="start">
+        <ion-menu-button>
+          <fa-icon [icon]="faBars" class="text-xl text-primary"></fa-icon>
+        </ion-menu-button>
+      </ion-buttons>
+
+      <ion-title>
+        <span class="-ml-12" *ngIf="tareasService.apartadoadmin === false">Tareas</span>
+        <span class="-ml-12" *ngIf="tareasService.apartadoadmin === true">Actividades</span>
+      </ion-title>
+
+    </ion-toolbar>
+
+  </ion-header>
+
+<ion-content>
+  <div class="h-full px-3 flex flex-col overflow-auto pb-3">
+      <ion-refresher slot="fixed" (ionRefresh)="refreshData($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      <div class="flex py-3 flex-col gap-4 ">
+          <div class="flex flex-col gap-3 ">
+            <div class="flex flex-col gap-3">
+              <div class="flex justify-between items-center">
+
+                <div class="flex justify-between gap-1 items-center w-full">
+                  <div class="cumston-tarea flex items-center min-w-[110px] px-2">
+                    <fa-icon [icon]="faCalendar" class="text-xs text-black"></fa-icon>
+                    <ion-datetime-button style="--padding-left:1rem;" datetime="time"></ion-datetime-button>
+                    <div (click)="openModalcalendario()" class="absolute w-full h-full top-0 right-0"></div>
+                  </div>
+
+                  <!-- <div class="flex flex-col uppercase font-bold"> -->
+                    <!-- <span class="text-base ">{{dia | fecha: 'LLLL'}}</span> -->
+                    <!-- <span class="text-sm">Semana {{nroSemana}}</span>
+                  </div> -->
+                  <div class="w-[24px] h-[24px] flex items-center justify-center bg-[#F5F7FC] rounded" (click)="vercontent = true" *ngIf="!vercontent">
+                    
+                    <ion-icon name="chevron-down-outline" class="text-center justify-center text-xs"></ion-icon>
+                  </div> 
+                  <div class="w-[24px] h-[24px] flex items-center justify-center bg-[#F5F7FC] rounded" (click)="vercontent = false" *ngIf="vercontent">
+                    
+                    <ion-icon name="chevron-up-outline" class="text-center justify-center text-xs"></ion-icon>
+                  </div> 
+                </div>
+
+                
+
+              </div>
+
+              <!-- Lista de días de la semana-->
+              <div *ngIf="vercontent" class="flex flex-row border-b-[1px]">
+                <ion-button (click)="verSemanaAnterior()" fill="clear">
+                  <fa-icon slot="icon-only" [icon]="faAngleLeft" class="text-xl"></fa-icon>
+                </ion-button>
+
+                <div *ngIf="vm.semana?.length" class="grid grid-cols-7 gap-2 w-full">
+
+                  <div
+                    *ngFor="let diaSemana of vm.semana"
+                    (click)="diaSemana.habilitado ? seleccionarDia(diaSemana.fecha) : null"
+                    
+                    class="p-1 flex flex-col items-center rounded-lg font-display ion-activatable relative gap-2"
+                  >
+                    <ion-ripple-effect *ngIf="diaSemana.habilitado"></ion-ripple-effect>
+                    <span class="text-xxs capitalize">{{diaSemana.fecha | fecha: 'iii'}}.</span>
+                    <span class="text-[10px] font-bold w-[24px] h-[24px] flex items-center justify-center" [ngClass]="{
+                      '!bg-[#ECF4FF] border-primary !border rounded-[5px] !text-primary': vm.diaSeleccionado && isSameDay(diaSemana.fecha, vm.diaSeleccionado),
+                      'text-text-10 bg-white cursor-pointer': diaSemana.habilitado,
+                      'text-text-10': !diaSemana.habilitado
+
+                    }">{{diaSemana.fecha | fecha: 'dd'}}</span>
+                  </div>
+
+                </div>
+                <ion-button (click)="verSemanaSiguiente()" fill="clear" [disabled]="!vm.puedeAvanzarSemana">
+                  <fa-icon slot="icon-only" [icon]="faAngleRight" class="text-xl"></fa-icon>
+                </ion-button>
+              </div>
+            </div>
+
+            <!-- Segmento para cambiar entre pestañas -->
+            <ion-segment [(ngModel)]="selectedTab" (ionChange)="segmentChanged($event)" class="custom-segment h-9" mode="ios" *ngIf="tareasService.apartadoadmin===false">
+              <ion-segment-button class="m-1" value="mis-tareas">
+                <ion-label class="text-[10px]">Mis Tareas</ion-label>
+              </ion-segment-button>
+              <ion-segment-button class="m-1" value="tareas-sin-asignar">
+                <ion-label id="botonequipo" class="text-[10px]">Tareas sin asignar</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </div>
+        </div>
+        <div class="flex flex-col gap-3 flex-grow">
+          <!-- Widget de estadísticas -->
+          <div class="sticky top-0 z-10 bg-white py-3 -my-3" *ngIf="selectedTab !== 'tareas-sin-asignar' && tareasService.apartadoadmin===false">
+              <div class="rounded-lg flex gap-2">
+                <!-- Pendientes -->
+                <div class="flex-1 px-2 h-[45px] border border-gray-200 rounded-lg flex flex-col justify-center items-start gap-1">
+                    <div class="flex justify-between items-center w-full">
+                        <span class="text-[#1F1F1F] text-sm font-semibold">03</span>
+                        <div class="w-4 h-4 bg-yellow-50 rounded-full flex justify-center items-center">
+                            <fa-icon [icon]="faClock" class="text-yellow-500 text-xxss"></fa-icon>
+                        </div>
+                    </div>
+                    <span class="text-gray-500 text-xxs font-medium uppercase">Pendientes</span>
+                </div>
+                
+                <!-- En proceso -->
+                <div class="flex-1 px-2 h-[45px] border border-gray-200 rounded-lg flex flex-col justify-center items-start gap-1">
+                    <div class="flex justify-between items-center w-full">
+                        <span class="text-[#1F1F1F] text-sm font-semibold">05</span>
+                        <div class="w-4 h-4 bg-blue-50 rounded-full flex justify-center items-center">
+                            <fa-icon [icon]="faSpinner" class="text-blue-600 text-xxss"></fa-icon>
+                        </div>
+                    </div>
+                    <span class="text-gray-500 text-xxs font-medium uppercase">En proceso</span>
+                </div>
+                
+                <!-- Completas -->
+                <div class="flex-1 px-2 h-[45px] border border-gray-200 rounded-lg flex flex-col justify-center items-start gap-1">
+                    <div class="flex justify-between items-center w-full">
+                        <span class="text-[#1F1F1F] text-sm font-semibold">{{tareasRealizadas}}/{{totalTareas}}</span>
+                        <div class="w-4 h-4 bg-green-50 rounded-full flex justify-center items-center">
+                            <fa-icon [icon]="faCheck" class="text-green-500 text-xxss"></fa-icon>
+                        </div>
+                    </div>
+                    <span class="text-gray-500 text-xxs font-medium uppercase">Realizadas</span>
+                </div>
+            </div>
+          </div>
+
+          <!-- Widget de estadísticas mejorado para modo admin -->
+          <div class="sticky top-0 z-10 bg-white py-3 -my-3" *ngIf="tareasService.apartadoadmin===true">
+              <div class="rounded-lg flex gap-2">
+                <!-- Pendientes -->
+                <div class="flex-1 px-2 h-[45px] border border-gray-200 rounded-lg flex flex-col justify-center items-start gap-1">
+                    <div class="flex justify-between items-center w-full">
+                        <span class="text-[#1F1F1F] text-sm font-semibold">03</span>
+                        <div class="w-4 h-4 bg-yellow-50 rounded-full flex justify-center items-center">
+                            <fa-icon [icon]="faClock" class="text-yellow-500 text-xxss"></fa-icon>
+                        </div>
+                    </div>
+                    <span class="text-gray-500 text-xxss font-medium uppercase">Pendientes</span>
+                </div>
+                
+                <!-- En proceso -->
+                <div class="flex-1 px-2 h-[45px] border border-gray-200 rounded-lg flex flex-col justify-center items-start gap-1">
+                    <div class="flex justify-between items-center w-full">
+                        <span class="text-[#1F1F1F] text-sm font-semibold">05</span>
+                        <div class="w-4 h-4 bg-blue-50 rounded-full flex justify-center items-center">
+                            <fa-icon [icon]="faSpinner" class="text-blue-600 text-xxss"></fa-icon>
+                        </div>
+                    </div>
+                    <span class="text-gray-500 text-xxss font-medium uppercase">En proceso</span>
+                </div>
+                
+                <!-- Completas -->
+                <div class="flex-1 px-2 h-[45px] border border-gray-200 rounded-lg flex flex-col justify-center items-start gap-1">
+                    <div class="flex justify-between items-center w-full">
+                        <span class="text-[#1F1F1F] text-sm font-semibold">04</span>
+                        <div class="w-4 h-4 bg-green-50 rounded-full flex justify-center items-center">
+                            <fa-icon [icon]="faCheck" class="text-green-500 text-xxss"></fa-icon>
+                        </div>
+                    </div>
+                    <span class="text-gray-500 text-xxss font-medium uppercase">Completas</span>
+                </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center" *ngIf="tareasService.apartadoadmin===true">
+              <span class="text-sm font-semibold">
+                Lista de actividades
+              </span>
+              <div class="flex justify-start items-center gap-1">
+                  <span class="justify-start text-sm font-bold ">
+                    {{tareasService.apartadoadmin ? tareasAdminFiltradas.length : tareasFiltradas.length}}
+                  </span>
+                  <div class="p-0.5 flex flex-col justify-center items-center gap-2.5">
+                      <ion-icon name="briefcase-outline" class="text-sm"></ion-icon>
+                  </div>
+              </div>
+          </div>
+
+          <div class=" flex justify-between items-center border-b border-[#ECECEC] pb-2" *ngIf="tareasService.apartadoadmin===false">
+              <span class="text-sm font-semibold">
+                Mi lista de tareas
+              </span>
+          </div>
+
+          <div class="flex gap-2">
+            <ion-searchbar clear-icon="close-circle-outline"
+              class="sinsombra !p-0 border border-text-10 rounded-lg h-12 custom" placeholder="Buscar"
+              name="busqueda_tareas" id="busqueda_tareas" [(ngModel)]="searchTerm"
+              (ionInput)="onSearchBarInput($event)"></ion-searchbar>
+            <app-button-outline-base (click)="tareasService.apartadoadmin=== true ? openModalfiltroAdmin() : abrirModalFiltro()"  [icono]="faSliders"></app-button-outline-base>
+          </div>
+
+          <div class="flex flex-row gap-2 ">
+            <div class="bg-[#ECF4FF]  px-2 py-1 rounded-full flex items-center">
+              <span class="text-xxs text-[#545F71]">Categ.: Todos</span>
+            </div>
+            <div class="bg-[#ECF4FF] px-2 py-1 rounded-full flex items-center">
+              <span class="text-xxs text-[#545F71]">Estado: Pendiente</span>
+            </div>
+          </div>
+          <!-- Indicador de carga con skeleton - MODO NORMAL -->
+          <div *ngIf="vm.tareaLoading && !tareasService.apartadoadmin" class="flex flex-col gap-3">
+              <ion-skeleton-text
+                *ngFor="let _ of [].constructor(2)"
+                [animated]="true"
+                class="my-0 rounded-2xl"
+                style="height: 120px">
+              </ion-skeleton-text>
+          </div>
+
+          <!-- Indicador de carga con skeleton - MODO ADMIN -->
+          <div *ngIf="vm.tareaLoadingAdmin && tareasService.apartadoadmin" class="flex flex-col gap-3">
+              <ion-skeleton-text
+                *ngFor="let _ of [].constructor(2)"
+                [animated]="true"
+                class="my-0 rounded-2xl"
+                style="height: 120px">
+              </ion-skeleton-text>
+          </div>
+          
+          <!-- Estado vacío - MODO NORMAL -->
+          <ng-container *ngIf="selectedTab === 'mis-tareas'">
+            <app-empty-state
+              *ngIf="mostrarEmpty && !vm.tareaLoading && !tareasService.apartadoadmin"
+              class="grow flex items-center justify-center pb-10" 
+              img="assets/image/img-empty-tarea.png"
+              [titulo]="getTextoVacio()"
+              [descripcion]="getDescripcionVacio()">
+            </app-empty-state>
+          </ng-container>
+
+          <ng-container *ngIf="selectedTab === 'tareas-sin-asignar'">
+            <app-empty-state
+              *ngIf="mostrarEmpty && !vm.tareaLoading && !tareasService.apartadoadmin"
+              class="grow flex items-center justify-center pb-10" 
+              img="assets/image/img-empty-tarea.png"
+              [titulo]="getTextoVacio()"
+              [descripcion]="getDescripcionVacio()">
+            </app-empty-state>
+          </ng-container>
+
+          <!-- Estado vacío - MODO ADMIN -->
+          <app-empty-state
+            *ngIf="mostrarEmptyAdmin && !vm.tareaLoadingAdmin && tareasService.apartadoadmin"
+            class="grow flex items-center justify-center pb-10" 
+            img="assets/image/img-empty-tarea.png"
+            titulo="No tienes actividades registradas"
+            descripcion="Vuelve pronto para ver nuevas actividades">
+          </app-empty-state>
+          
+          <!-- Lista de tareas dinámicas - MODO NORMAL -->
+          <ng-container *ngIf="tareasFiltradas.length > 0 && !vm.tareaLoading && tareasService.apartadoadmin === false">
+              <div 
+                *ngFor="let tarea of tareasFiltradas; trackBy: trackByTareaId" 
+                
+                class="self-stretch rounded-[10px] flex justify-start items-center" (click)="tareasDeshabilitadas ? null : completarTarea(tarea.id)">
+                  <div 
+                    class="flex-1 py-2 h-[120px] px-3 bg-white rounded-[10px] border-r border-t border-b border-[#e4e4e4] flex justify-start items-center gap-2"
+                    [style.box-shadow]="'inset 3px 0px 0px 0px ' + getBorderColor(tarea)"
+                    [ngClass]="{
+                      'opacity-50 cursor-not-allowed': tareasDeshabilitadas,
+                      'cursor-pointer': !tareasDeshabilitadas,
+                      'parpadeo-tarea-anadida': tareaRecienAnadida === tarea.id
+                    }"
+                    >
+                    <!-- tareaRecienAnadida === tarea.id -->
+                      <div class="flex-1 flex flex-col justify-center items-start gap-2">
+                          <div class="self-stretch flex flex-col justify-center items-start gap-1">
+                              <div class="self-stretch flex justify-between items-start gap-1">
+                                <div class="flex  h-6 items-center">
+                                  <span 
+                                    class="flex-1 line-clamp-2 text-xs font-medium">
+                                    {{tarea.titulo}}
+                                  </span>
+                                </div>
+                                  <div 
+                                        *ngIf="selectedTab === 'tareas-sin-asignar'"
+                                        class="w-[17px] h-[17px] rounded-full flex items-center justify-center gap-1"
+                                        [ngClass]="{
+                                          'bg-[#1ed467] outline-[#1ed467]': isTareaSeleccionada(tarea.id),
+                                          'bg-white border border-[#c6c6c6] outline-[#c6c6c6]': !isTareaSeleccionada(tarea.id),
+                                          'cursor-pointer': true
+                                        }"
+                                        (click)="toggleSeleccionTarea(tarea.id, $event)">
+                                          <span 
+                                            class="text-[8px] font-bold text-white"
+                                            *ngIf="isTareaSeleccionada(tarea.id)">
+                                            ✔
+                                          </span>
+                                      </div>
+                              </div>
+                              <div class="w-full flex flex-col gap-1">
+                                  <!-- Tag de tipo de tarea -->
+                                  <div class="size- flex gap-1">
+                                      <div
+                                          class="size- rounded-[19px] flex justify-start flex-col gap-1">
+                                          <div class="flex flex-row items-center ">
+                                            <ion-icon name="layers-outline" class="text-neutral-700 text-xxs mr-1"></ion-icon>
+                                            <span class="text-[#363636] text-[10px] font-normal ">Categoria: {{tarea.Categoria}}</span>
+                                            <ion-icon name="layers-outline" class="ml-3 text-neutral-700 text-xxs mr-1"></ion-icon>
+                                            <span class="text-[#363636] text-xxs font-normal ">SubCategoria: {{tarea.Categoria}}</span>
+                                          </div>
+                                          <div class="flex flex-row items-center">
+                                            <ion-icon name="time-outline" class="text-neutral-700 text-xxs mr-1"></ion-icon>
+                                            <span class="text-[#363636] text-xxs font-normal">Hora programada: {{tarea.horainicio}}</span>
+                                          </div>
+                                          <div class="flex flex-row gap-1">
+                                            <div class="flex flex-row items-center">
+                                              <ion-icon name="time-outline" class="text-neutral-700 text-xxs mr-1"></ion-icon>
+                                              <span class="text-[#363636] text-xxs font-normal">Inicio: --:-- --:--</span>
+                                            </div>
+                                            <div class="flex flex-row items-center">
+                                              <ion-icon name="time-outline" class="text-neutral-700 text-xxs mr-1"></ion-icon>
+                                              <span class="text-[#363636] text-xxs font-normal">Fin: --:-- --:--</span>
+                                            </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  
+                                  <!-- Progreso de subtareas con indicador visual -->
+                                  <div class="w-full flex items-center justify-between gap-1">
+                                    <div class="flex gap-2">
+                                      <div 
+                                        class="px-2 w-[71px] h-[18px] rounded-full flex items-center justify-center gap-1"
+                                        [ngClass]="{
+                                          'bg-[#1ed467] outline-[#1ed467]': tarea.completada,
+                                          ' outline-[#c6c6c6]': !tarea.completada,
+                                          'bg-[#ECF4FF] text-[#3B82F6] outline-[#c6c6c6]': tarea.estado ==='En progreso',
+                                          'bg-[#FFF9E7] text-[#F2A626] outline-[#c6c6c6]': tarea.estado ==='Pendiente',
+                                          'bg-[#F5FBF4] text-[#6DC560] outline-[#c6c6c6]': tarea.estado ==='Completada',
+                                          'bg-[#C7C7C7] text-white outline-[#c6c6c6]': tarea.estado ==='Cerrada',
+                                          'cursor-pointer': !tareasDeshabilitadas,
+                                          'cursor-not-allowed opacity-50': tareasDeshabilitadas
+                                        }">
+                                          <span 
+                                            class="text-xxs font-normal ">
+                                            {{tarea.estado}}
+                                          </span>
+                                      </div>
+                                      <div 
+                                        class="px-2 h-[18px] rounded-full flex items-center justify-center gap-1"
+                                        [ngClass]="{
+                                          'bg-success-5 text-success': tarea.Prioridad === 'Baja',
+                                          'bg-yellow-5 text-yellow': tarea.Prioridad === 'Media',
+                                          'bg-danger-5 text-danger': tarea.Prioridad === 'Alta'
+                                        }">
+                                        <fa-icon [icon]="faFlag" class="text-xxs"></fa-icon>
+                                          <span 
+                                            class="text-[10px] font-normal">
+                                            {{tarea.Prioridad}}
+                                          </span>
+                                      </div>
+                                    </div>
+                                      <button class="flex items-center justify-center cursor-pointer bg-[#3B82F6] px-2 h-6 w-[55px] rounded py-[5px]" *ngIf="selectedTab==='mis-tareas' && tarea.estado === 'Pendiente'"
+                                        (click)="openModalIniciar(tarea.id, $event)"><span class="font-medium text-[10px] text-white"> Iniciar </span></button>
+                                      <button class="flex items-center justify-center cursor-pointer bg-[#3B82F6] px-2 rounded py-[5px] h-6 w-[55px]" *ngIf="selectedTab==='mis-tareas' && tarea.estado === 'En progreso'"
+                                      (click)="openModalFinalizar(tarea.id, $event)"><span class="font-medium text-[10px] text-white " >Finalizar</span></button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </ng-container>
+
+          <!-- Lista de tareas dinámicas - MODO ADMIN -->
+          <ng-container *ngIf="tareasAdminFiltradas.length > 0 && !vm.tareaLoadingAdmin && tareasService.apartadoadmin === true">
+                  <div *ngFor="let tarea of tareasAdminFiltradas; trackBy: trackByTareaAdminId" 
+                    class="flex-1 py-2 h-[132px] px-3 bg-white rounded-[10px] border-r border-t border-b border-[#e4e4e4] flex justify-start items-center gap-2"
+                    [style.box-shadow]="'inset 3px 0px 0px 0px ' + getBorderColorAdmin(tarea)" (click)="navegarATareaInfo(tarea)"
+                    [ngClass]="{
+                      'opacity-50 cursor-not-allowed': tareasDeshabilitadas,
+                      'cursor-pointer': !tareasDeshabilitadas
+                    }"
+                    >
+                      <div class="flex-1 flex flex-col justify-center items-start gap-2">
+                          <div class="self-stretch flex flex-col justify-center items-start gap-1">
+                              <div class="self-stretch flex justify-start items-start gap-1">
+                                <div class="flex items-center h-6">
+                                  <span 
+                                    class="flex-1 line-clamp-2 justify-center text-xs font-medium">
+                                    {{tarea.titulo}}
+                                  </span>
+                                </div>                                
+                                  <div 
+                                        
+                                        *ngIf="selectedTab === 'tareas-sin-asignar'"
+                                        class="w-[17px] h-[17px] rounded-full flex items-center justify-center gap-1"
+                                        [ngClass]="{
+                                          'bg-[#1ed467] outline-[#1ed467]': tarea.estado === 'Completada',
+                                          'bg-white border border-[#c6c6c6] outline-[#c6c6c6]': tarea.estado !== 'Completada',
+                                          'cursor-pointer': !tareasDeshabilitadas,
+                                          'cursor-not-allowed opacity-50': tareasDeshabilitadas
+                                        }"
+                                        (click)="onBotonCompletarClick(tarea.id, $event)">
+                                          <span 
+                                            class="text-[8px] font-bold text-white">
+                                            ✔
+                                          </span>
+                                      </div>
+                              </div>
+                              <div class="w-full flex flex-col gap-1">
+                                  <!-- Tag de tipo de tarea ADMIN -->
+                                  <div class="size- flex gap-1">
+                                      <div 
+                                          class="size- rounded-[19px] flex justify-start flex-col gap-1">
+                                          <div class="flex flex-row items-center gap-1">
+                                            <div class="w-[14px] h-[14px] flex justify-center items-center">
+                                              <fa-icon [icon]="faStore" style="font-size: 8px; font-weight: normal;" ></fa-icon>
+                                            </div>
+                                            <span class="text-[#363636] text-xxs">Sucursal: {{tarea.sucursal}}</span>
+                                          </div>
+                                          <div class="flex flex-row items-center gap-1">
+                                            <div class="flex flex-row items-center gap-1">
+                                            <div class="w-[14px] h-[14px] flex justify-center items-center">
+                                            <fa-icon [icon]="faLayerGroup" style="font-size: 10px; font-weight: normal;"></fa-icon>
+                                            </div>
+                                            <span class="text-[#363636] text-xxs">Categoria: {{tarea.Categoria}}</span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                            <div class="w-[14px] h-[14px] flex justify-center items-center">
+                                            <ion-icon name="ellipse" style="font-size: 4px" class="text-[#363636] flex"></ion-icon>
+                                            </div>
+                                            <span class="text-[#363636] text-xxs">ID: {{tarea.id}}</span>
+                                          </div>
+                                            </div>
+                                            
+                                          <div class="flex flex-row items-center gap-1">
+                                            <div class="w-[14px] h-[14px] flex justify-center items-center">
+                                            <fa-icon [icon]="faClock" style="font-size: 10px; font-weight: normal;"></fa-icon>
+                                            </div>
+                                            <span class="text-[#363636] text-xxs">Hora programada: {{tarea.horaprogramada}}</span>
+                                          </div>
+                                          <div class="flex flex-row gap-1">
+                                            <div class="flex flex-row items-center gap-1">
+                                            <div class="w-[14px] h-[14px] flex justify-center items-center">
+                                              <fa-icon [icon]="faClock" style="font-size: 10px; font-weight: normal;"></fa-icon>
+                                            </div>
+                                              <span class="text-[#363636] text-xxs">Inicio: {{tarea.horainicio}}</span>
+                                            </div>
+                                            <div class="flex flex-row items-center gap-1">
+                                            <div class="w-[14px] h-[14px] flex justify-center items-center">
+                                              <fa-icon [icon]="faClock" style="font-size: 10px; font-weight: normal;"></fa-icon>
+                                            </div>
+                                              <span class="text-[#363636] text-xxs">Fin: {{tarea.horafin}}</span>
+                                            </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  
+                                  <!-- Progreso de subtareas ADMIN -->
+                                  <div class="w-full flex items-center justify-between gap-1">
+                                    <div class="flex flex-row ">
+                                      <div 
+                                        class="h-[17px] rounded-full flex items-center justify-center gap-1">
+                                        <div class="w-[14px] h-[14px] flex justify-center items-center">
+                                          <fa-icon [icon]="faListCheck" class="text-xxs"></fa-icon>
+                                        </div>
+                                          <span 
+                                            class="text-xxs ">
+                                            {{tarea.subtareasCompletadas}}/{{tarea.totalSubtareas}} completadas
+                                          </span>
+                                      </div>
+                                    </div>
+                                      <div 
+                                        class="px-2 py-1 h-[18px] w-[71px] rounded-full flex items-center justify-center gap-1"
+                                        [ngClass]="{
+                                          'bg-[#F5FBF4] text-[#6DC560] outline-[#6DC560]': tarea.estado === 'Completada',
+                                          'bg-[#ECF4FF] text-[#3B82F6] outline-[#3B82F6]': tarea.estado === 'En progreso',
+                                          'bg-[#FFF9E7] text-[#F2A626] outline-[#F2A626]': tarea.estado === 'Pendiente',
+                                          'cursor-pointer': !tareasDeshabilitadas,
+                                          'cursor-not-allowed opacity-50': tareasDeshabilitadas
+                                        }">
+                                          <span 
+                                            class="text-[10px] font-normal ">
+                                            {{tarea.estado}}
+                                          </span>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+          </ng-container>
+        </div>
+
+    </div>
+    
+    <!-- Ion Infinite Scroll -->
+    <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+      <div class="infinite-scroll-content-tareas">
+        <div
+        *ngIf="vm.tareaLoading && tareasService.apartadoadmin === false"
+        class="relative grow h-[50px]">
+        <app-loading
+        [floating]="true"
+        [message]="'Cargando Tareas...'"
+        ></app-loading>
+        </div>
+        <div
+        *ngIf="vm.tareaLoadingAdmin && tareasService.apartadoadmin === true"
+        class="relative grow h-[50px]">
+        <app-loading
+        [floating]="true"
+        [message]="'Cargando Actividades...'"
+        ></app-loading>
+        </div>
+      </div>
+    </ion-infinite-scroll>
+  
+  <!-- Toast dinámico con botón "Deshacer" -->
+  <app-toast-notificacion
+    [mostrar]="mostrarToast"
+    [config]="configToast"
+    [duracion]="duracionToast"
+    (botonClick)="onBotonToastClick()"
+    (cerrarClick)="onCerrarToast()">
+  </app-toast-notificacion>
+</ion-content>
+
+<!-- Botón fijo en la parte inferior -->
+<ion-footer class="p-4 bg-white" *ngIf="selectedTab === 'tareas-sin-asignar'">
+  <div>
+    <ion-button 
+      expand="block"
+      [disabled]="!hayTareasSeleccionadas"
+      (click)="openModalAignar($event)">
+      <span *ngIf="!hayTareasSeleccionadas">Selecciona tareas para añadir</span>
+      <span *ngIf="hayTareasSeleccionadas">
+        Añadir {{numeroTareasSeleccionadas}} tarea(s) a mi lista
+      </span>
+    </ion-button>
+  </div>
+</ion-footer>
+
+<ion-modal [keepContentsMounted]="true">
+  <ng-template>
+    <ion-datetime 
+      id="time" 
+      presentation="date" 
+      [(ngModel)]="diaString" 
+      [max]="fechaMaxString"
+      (ionChange)="onDiaChange()">
+    </ion-datetime>
+  </ng-template>
+</ion-modal>

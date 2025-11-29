@@ -1,0 +1,26 @@
+.sinsombra {
+  box-shadow: none !important;
+}
+
+// Animación de parpadeo para cuando se añade una tarea
+@keyframes parpadeo-tarea-anadida {
+  0% { 
+    transform: scale(1);
+  }
+  25% { 
+    transform: scale(1.02);
+  }
+  50% { 
+    transform: scale(1.03);
+  }
+  75% { 
+    transform: scale(1.02);
+  }
+  100% { 
+    transform: scale(1);
+  }
+}
+
+.parpadeo-tarea-anadida {
+  animation: parpadeo-tarea-anadida 2s ease-in-out;
+}

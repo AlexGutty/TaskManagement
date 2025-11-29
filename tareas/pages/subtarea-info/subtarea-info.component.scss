@@ -1,0 +1,115 @@
+// Estilos para el componente subtarea-info
+
+ion-header {
+  ion-toolbar {
+    --background: #ffffff;
+    --border-color: #e5e7eb;
+  }
+}
+
+ion-content {
+  --background: #f9fafb;
+}
+
+// Estilos para el textarea
+ion-textarea {
+  --background: #ffffff;
+  --color: #374151;
+  --placeholder-color: #9ca3af;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  
+  &.has-focus {
+    --border-color: #3b82f6;
+    border-color: #3b82f6;
+  }
+}
+
+// Botón de subir archivo con estilo dashed
+.upload-button {
+  border: 2px dashed #d1d5db;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: #9ca3af;
+    background-color: #f9fafb;
+  }
+}
+
+// Estilos para archivos subidos
+.archivo-item {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #e5e7eb;
+  }
+}
+
+// Botón finalizar personalizado
+.btn-finalizar {
+  --background: #3b82f6;
+  --background-hover: #2563eb;
+  --color: white;
+  font-weight: 500;
+  margin: 0;
+  height: 48px;
+}
+
+// Espaciado consistente
+.section-spacing {
+  margin-bottom: 1.5rem;
+}
+
+// Iconos con tamaño consistente
+ion-icon {
+  font-size: 1.125rem;
+}
+
+// Estilos para la tarjeta de subtarea
+.subtarea-card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  ion-content {
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+}
+
+// Animación de parpadeo para cuando se añade la tarea
+@keyframes parpadeo-exito {
+  0% { 
+    background-color: #ffffff;
+    transform: scale(1);
+  }
+  25% { 
+    background-color: #dcfce7;
+    transform: scale(1.02);
+  }
+  50% { 
+    background-color: #bbf7d0;
+    transform: scale(1.03);
+  }
+  75% { 
+    background-color: #dcfce7;
+    transform: scale(1.02);
+  }
+  100% { 
+    background-color: #ffffff;
+    transform: scale(1);
+  }
+}
+
+.parpadeo-exito {
+  animation: parpadeo-exito 1.5s ease-in-out;
+}
+
+.bg-image{
+  background-image: url('https://images.pexels.com/photos/2480092/pexels-photo-2480092.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&dpr=1');
+  background-size: cover;
+  background-position: center;
+}

@@ -1,0 +1,83 @@
+// Toast personalizado de éxito que coincide con el diseño de la imagen
+.custom-toast-success {
+  --background: #f0fdf4;
+  --color: #166534;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --max-width: calc(100% - 32px);
+  --min-height: 56px;
+  
+  border-left: 4px solid #22c55e;
+  margin: 16px;
+  padding: 0;
+  
+  .toast-wrapper {
+    padding: 16px 20px;
+    
+    .toast-message {
+      font-size: 14px;
+      font-weight: 600;
+      color: #166534;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .toast-icon {
+      color: #22c55e;
+      font-size: 20px;
+      margin-right: 8px;
+    }
+    
+    .toast-button {
+      color: #9ca3af;
+      --color: #9ca3af;
+      
+      &:hover {
+        --color: #6b7280;
+      }
+    }
+  }
+}
+
+
+:host ::ng-deep .textarea-style {
+  input {
+    font-size: 12px !important;
+  }
+  
+  input::placeholder {
+    font-size: 12px !important;
+    color: #6b7280 !important;
+  }
+}
+.custom-select-creartarea {
+  &::part(icon) {
+    /* Establece la posición absoluta para posicionar el icono a la derecha */
+    position: absolute;
+    /* Define la ubicación del icono en el lado derecho */
+    right: 10px; /* Ajusta este valor según tus necesidades */
+    /* Centra verticalmente el icono */
+    top: 50%;
+    transform: translateY(-50%);
+    /* Ajusta el tamaño del icono si es necesario */
+    font-size: 12px; /* Ajusta este valor según tus necesidades */
+    color: black;
+  }
+
+  &::part(label) {
+    display: none;
+  }
+
+  &::part(placeholder) {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  &::part(text) {
+    font-size: 12px;
+    color: #374151;
+  }
+  
+}
