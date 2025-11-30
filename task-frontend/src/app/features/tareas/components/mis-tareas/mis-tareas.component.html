@@ -1,1 +1,84 @@
-mis tareas
+<div class="mis-tareas-container">
+  <div class="header-section">
+    <h2>Mis Tareas</h2>
+    <ion-button fill="clear" (click)="abrirFiltros()">
+      <ion-icon slot="start" name="filter-outline"></ion-icon>
+      Filtros
+    </ion-button>
+  </div>
+
+  <div class="search-section">
+    <ion-searchbar
+      [(ngModel)]="searchTerm"
+      (ionInput)="aplicarFiltros()"
+      placeholder="Buscar tareas...">
+    </ion-searchbar>
+  </div>
+
+  <div class="filtros-rapidos">
+    <ion-segment [(ngModel)]="filtroEstado" (ionChange)="aplicarFiltros()">
+      <ion-segment-button value="todas">
+        <ion-label>Todas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pendiente">
+        <ion-label>Pendientes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="en progreso">
+        <ion-label>En Progreso</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="completado">
+        <ion-label>Completadas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div class="tareas-lista" *ngIf="!isLoading">
+    <ion-card *ngFor="let tarea of tareasFiltradas" class="tarea-card" (click)="verDetalleTarea(tarea)">
+      <ion-card-header>
+        <div class="card-header-content">
+          <ion-card-title>{{ tarea.titulo }}</ion-card-title>
+          <ion-chip [class]="getPrioridadClass(tarea.prioridad)" size="small">
+            {{ tarea.prioridad }}
+          </ion-chip>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p class="descripcion">{{ tarea.descripcion }}</p>
+
+        <div class="tarea-meta">
+          <div class="meta-chips">
+            <ion-chip [class]="getEstadoClass(tarea.estado)" size="small">
+              <ion-icon name="ellipse"></ion-icon>
+              <ion-label>{{ tarea.estado }}</ion-label>
+            </ion-chip>
+            <ion-chip size="small" *ngIf="tarea.categoria">
+              <ion-icon name="pricetag-outline"></ion-icon>
+              <ion-label>{{ tarea.categoria }}</ion-label>
+            </ion-chip>
+          </div>
+
+          <div class="progreso" *ngIf="tarea.progreso !== undefined">
+            <span class="progreso-text">{{ tarea.progreso }}%</span>
+            <ion-progress-bar [value]="tarea.progreso / 100"></ion-progress-bar>
+          </div>
+
+          <div class="fecha" *ngIf="tarea.fechaVencimiento">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Vence: {{ tarea.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="empty-state" *ngIf="tareasFiltradas.length === 0 && !isLoading">
+      <ion-icon name="document-text-outline"></ion-icon>
+      <p>No se encontraron tareas</p>
+      <p class="empty-subtitle">No tienes tareas asignadas que coincidan con los filtros seleccionados</p>
+    </div>
+  </div>
+</div>

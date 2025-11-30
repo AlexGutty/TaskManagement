@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Sub-Tareas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="crearSubTarea()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && tarea" class="tarea-info">
+    <h2>{{ tarea.titulo }}</h2>
+    <p>{{ tarea.descripcion }}</p>
+  </div>
+
+  <app-sub-tareas
+    [subTareas]="subTareas"
+    [tareaId]="tareaId"
+    (onCrear)="crearSubTarea()"
+    (onEditar)="editarSubTarea($event)"
+    (onEliminar)="eliminarSubTarea($event)"
+  ></app-sub-tareas>
+</ion-content>

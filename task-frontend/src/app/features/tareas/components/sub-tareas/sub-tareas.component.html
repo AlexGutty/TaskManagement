@@ -1,0 +1,48 @@
+<div class="sub-tareas-container">
+  <div class="progreso-total" *ngIf="subTareas.length > 0">
+    <div class="progreso-info">
+      <span>Progreso Total</span>
+      <span class="porcentaje">{{ getProgresoTotal() }}%</span>
+    </div>
+    <ion-progress-bar [value]="getProgresoTotal() / 100"></ion-progress-bar>
+  </div>
+
+  <div class="sub-tareas-lista">
+    <ion-card *ngFor="let subTarea of subTareas" class="sub-tarea-card">
+      <ion-card-content>
+        <div class="sub-tarea-header">
+          <ion-checkbox [(ngModel)]="subTarea.completado" (ionChange)="toggleCompletado(subTarea)"></ion-checkbox>
+          <div class="sub-tarea-titulo">
+            <h3 [class.completado]="subTarea.completado">{{ subTarea.titulo }}</h3>
+            <p>{{ subTarea.descripcion }}</p>
+          </div>
+        </div>
+
+        <div class="sub-tarea-info">
+          <ion-chip [class]="getPrioridadClass(subTarea.prioridad)">
+            {{ subTarea.prioridad }}
+          </ion-chip>
+          <ion-chip>
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{ subTarea.fechaVencimiento | date:'dd/MM/yyyy' }}
+          </ion-chip>
+        </div>
+
+        <div class="sub-tarea-acciones">
+          <ion-button fill="clear" size="small" (click)="editarSubTarea(subTarea)">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" color="danger" (click)="eliminarSubTarea(subTarea)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="empty-state" *ngIf="subTareas.length === 0">
+      <ion-icon name="list-outline"></ion-icon>
+      <p>No hay sub-tareas registradas</p>
+      <ion-button (click)="crearSubTarea()">Crear Sub-Tarea</ion-button>
+    </div>
+  </div>
+</div>
