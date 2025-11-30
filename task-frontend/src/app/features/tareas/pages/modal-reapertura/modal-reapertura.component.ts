@@ -3,6 +3,7 @@ import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-modal-reapertura',
+  standalone:false,
   templateUrl: './modal-reapertura.component.html',
   styleUrls: ['./modal-reapertura.component.scss'],
 })

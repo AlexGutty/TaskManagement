@@ -6,6 +6,7 @@ import { BuscadorGeneralComponentComponent } from 'src/app/ui/buscador-general-c
 
 @Component({
   selector: 'app-modal-form',
+  standalone:false,
   templateUrl: './modal-form.component.html',
   styleUrls: ['./modal-form.component.scss'],
 })

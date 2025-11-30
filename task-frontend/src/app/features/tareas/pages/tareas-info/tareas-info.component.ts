@@ -39,6 +39,7 @@ interface TareaDisponible {
 
 @Component({
   selector: 'app-tareas-info',
+  standalone:false,
   templateUrl: './tareas-info.component.html',
   styleUrls: ['./tareas-info.component.scss'],
 })

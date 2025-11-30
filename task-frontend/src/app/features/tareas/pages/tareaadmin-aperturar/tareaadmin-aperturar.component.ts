@@ -6,6 +6,7 @@ import { ModalController, ToastController } from '@ionic/angular';
 import { ModalFormComponent } from '../modal-form/modal-form.component';
 @Component({
   selector: 'app-tareaadmin-aperturar',
+  standalone:false,
   templateUrl: './tareaadmin-aperturar.component.html',
   styleUrls: ['./tareaadmin-aperturar.component.scss'],
 })

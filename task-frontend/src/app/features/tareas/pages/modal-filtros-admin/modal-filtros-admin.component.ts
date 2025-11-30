@@ -11,6 +11,7 @@ interface FiltroOpcion {
 
 @Component({
   selector: 'app-modal-filtros-admin',
+  standalone:false,
   templateUrl: './modal-filtros-admin.component.html',
   styleUrls: ['./modal-filtros-admin.component.scss'],
 })

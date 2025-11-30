@@ -28,6 +28,7 @@ import { ModalFiltrosComponent } from './pages/modal-filtros/modal-filtros.compo
 import { Tarea, tareaadmin, TareasService } from './tareas.service';
 @Component({
   selector: 'app-tareas',
+  standalone:false,
   templateUrl: './tareas.page.html',
   styleUrls: ['./tareas.page.scss'],
 })

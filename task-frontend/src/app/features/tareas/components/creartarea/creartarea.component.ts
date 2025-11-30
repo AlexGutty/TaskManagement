@@ -7,6 +7,7 @@ import { BuscadorGeneralComponentComponent } from 'src/app/ui/buscador-general-c
 
 @Component({
   selector: 'app-creartarea',
+  standalone:false,
   templateUrl: './creartarea.component.html',
   styleUrls: ['./creartarea.component.scss'],
 })

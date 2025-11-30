@@ -12,6 +12,7 @@ import { Tarea, TareaAdmin, TareasService } from '../../tareas.service';
 ;
 @Component({
   selector: 'app-subtarea-info',
+  standalone:false,
   templateUrl: './subtarea-info.component.html',
   styleUrls: ['./subtarea-info.component.scss'],
 })
